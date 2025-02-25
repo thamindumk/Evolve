@@ -3,6 +3,7 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 # useful for handling different item types with a single interface
+import uuid
 from .utils import getDBConnection
 import hashlib
 
@@ -79,13 +80,13 @@ class SavingToPostgreSqlPipeline(object):
     def insert_db(self, item):
         try:
             # query to insert data to product table
-            query_string = "INSERT INTO product (title, shop_name, price, availability, description, sizes, images, link) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id;"
+            query_string = "INSERT INTO product (id,title, shop_name, price, availability, description, sizes, images, link) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id;"
 
             # we want to pass set of parameters. here are the parameters
             item_set = (
-                item['title'], item['shop_name'], item['price'], item['availability'], item['description'],
+                str(uuid.uuid4()) ,item['title'], item['shop_name'], item['price'], item['availability'], item['description'],
                 self.to_curly_brackets(item['sizes']), self.to_curly_brackets(item['images']), item['link'],)
-
+            print(item_set)
             # execute and commit the query data
             self.curr.execute(query_string, item_set)
             self.connection.commit()

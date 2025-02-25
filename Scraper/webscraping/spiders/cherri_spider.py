@@ -30,12 +30,12 @@ class CherriSpider(CrawlSpider):
         price = response.css('.hidden-xs > .p18').css('::text').extract()
         images = response.css('.xzoom-gallery5::attr(src)').extract()
         sizes = response.css('.sizeBtn').css('::text').extract()
-
+        cleaned_sizes = [size.strip() for size in sizes if size.strip()]
         items['title'] = title
         items['description'] = description
         items['price'] = price[-1]
         items['images'] = images
-        items['sizes'] = sizes
+        items['sizes'] = cleaned_sizes
         items['link'] = response.request.url
         items['availability'] = True if len(sizes) > 0 else False
         items['shop_name'] = "cherri"
